@@ -60,3 +60,6 @@
     tags:
       deployment: ansible
       purpose: demo
+
+- name: Wait for Host to respond
+  ansible.builtin.wait_for_connection:
