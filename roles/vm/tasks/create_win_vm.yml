@@ -55,6 +55,9 @@
     tags:
       deployment: ansible
       purpose: demo
+      owner: ptoal
+      environment: demo
+      operating_system: "Windows Server 2022"
 
 - name: Create VM script extension to enable HTTPS WinRM listener
   azure.azcollection.azure_rm_virtualmachineextension:

@@ -55,11 +55,14 @@
       publisher: RedHat
       sku: "{{ cloud_demo_azure_rhel_vm_sku }}"
       version: latest
-    max_price: "{{ cloud_demo_azure_vm_max_price }} "
+    max_price: "{{ cloud_demo_azure_vm_max_price }}"
     priority: "{{ cloud_demo_azure_vm_priority }}"
     tags:
       deployment: ansible
       purpose: demo
+      owner: ptoal
+      environment: demo
+      operating_system: "Red Hat Enterprise Linux 8"
 
 - name: Wait for Host to respond
   ansible.builtin.wait_for_connection:
