@@ -25,7 +25,7 @@
     name: "{{ cloud_demo_azure_nic_name }}"
     virtual_network: "{{ cloud_demo_azure_vnet_name }}"
     subnet: "{{ cloud_demo_azure_subnet_name }}"
-    security_group: "{{ network_sec_group_name }}"
+    security_group: "{{ cloud_demo_azure_network_sec_group_name }}"
   when: not cloud_demo_azure_public_ip
 
 - name: Create virtual network interface card with external ip
