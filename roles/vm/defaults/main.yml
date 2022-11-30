@@ -19,3 +19,8 @@ cloud_demo_azure_vm_priority: "Spot"
 
 cloud_demo_admin_user: azureuser
 cloud_demo_vm_name: '{{ inventory_hostname }}'
+
+cloud_demo_win_admin_user: "azureuser"
+cloud_demo_win_admin_password: "Changeme^15423"
+cloud_demo_win_vm_sku: "2022-Datacenter"
+cloud_demo_win_vm_size: "Standard_DS1_v2"
