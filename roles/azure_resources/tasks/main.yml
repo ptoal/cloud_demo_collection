@@ -1,0 +1,4 @@
+---
+- name: Create Resources
+  ansible.builtin.include_tasks:
+    file: create.yml
