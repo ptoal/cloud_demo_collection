@@ -1,0 +1,18 @@
+---
+# defaults file for vm
+cloud_demo_azure_resource_group: demo
+cloud_demo_azure_region: eastus
+cloud_demo_azure_vnet_name: vnet_demo
+cloud_demo_azure_vnet_cidr: '10.2.16.0/20'
+cloud_demo_azure_subnet_cidr: '10.2.16.0/24'
+cloud_demo_azure_subnet_name: 'subnet_demo'
+cloud_demo_azure_public_ip: false
+cloud_demo_azure_nic_name: '{{ inventory_hostname }}_demo_nic'
+cloud_demo_azure_public_ip_name: '{{ inventory_hostname }}_demo_ip'
+cloud_demo_azure_network_sec_group_name: 'demo_sec_group'
+
+cloud_demo_azure_vm_size: 'Standard_DS1_v2'
+cloud_demo_azure_disk_type: 'Standard_LRS'
+cloud_demo_azure_rhel_sku: '8_6'
+cloud_demo_azure_vm_max_price: "-1"
+cloud_demo_azure_vm_priority: "Spot"

@@ -1,0 +1,104 @@
+---
+- name: Create resource group
+  azure.azcollection.azure_rm_resourcegroup:
+    name: "{{ cloud_demo_azure_resource_group }}"
+    location: "{{ cloud_demo_azure_region }}"
+
+- name: Create virtual network
+  azure.azcollection.azure_rm_virtualnetwork:
+    resource_group: "{{ cloud_demo_azure_resource_group }}"
+    name: "{{ cloud_demo_azure_vnet_name }}"
+    address_prefixes: "{{ cloud_demo_azure_vnet_cidr }}"
+
+- name: Add subnet
+  azure.azcollection.azure_rm_subnet:
+    resource_group: "{{ cloud_demo_azure_resource_group }}"
+    name: "{{ cloud_demo_azure_subnet_name }}"
+    address_prefix: "{{ cloud_demo_azure_subnet_cidr }}"
+    virtual_network: "{{ cloud_demo_azure_vnet_name }}"
+
+- name: Create public IP address
+  azure.azcollection.azure_rm_publicipaddress:
+    resource_group: "{{ cloud_demo_azure_resource_group }}"
+    allocation_method: Static
+    name: "{{ cloud_demo_azure_public_ip_name }}"
+  register: output_ip_address
+  when: cloud_demo_azure_public_ip
+
+- name: Dump public IP for VM which will be created
+  ansible.builtin.debug:
+    msg: "The public IP is {{ output_ip_address.state.ip_address }}"
+  when: cloud_demo_azure_public_ip
+
+- name: Set Stat for Ansible Controller
+  ansible.builtin.set_stats:
+    data:
+      azure_vm_public_ip: "{{ output_ip_address.state.ip_address }}"
+    per_host: false
+  when: cloud_demo_azure_public_ip
+
+- name: Create Network Security Group that allows SSH, RDP and HTTP
+  azure.azcollection.azure_rm_securitygroup:
+    resource_group: "{{ cloud_demo_azure_resource_group }}"
+    name: "{{ cloud_demo_azure_network_sec_group_name }}"
+    rules:
+      - name: SSH
+        protocol: Tcp
+        destination_port_range: 22
+        access: Allow
+        priority: 1001
+        direction: Inbound
+      - name: RDP
+        protocol: Tcp
+        destination_port_range: 3389
+        access: Allow
+        priority: 1002
+        direction: Inbound
+      - name: HTTP
+        protocol: Tcp
+        destination_port_range: 80
+        access: Allow
+        priority: 1003
+        direction: Inbound
+
+- name: Create virtual network interface card with internal ip
+  azure.azcollection.azure_rm_networkinterface:
+    resource_group: "{{ cloud_demo_azure_resource_group }}"
+    name: "{{ cloud_demo_azure_nic_name }}"
+    virtual_network: "{{ cloud_demo_azure_vnet_name }}"
+    subnet: "{{ cloud_demo_azure_subnet_name }}"
+    security_group: "{{ network_sec_group_name }}"
+  when: not cloud_demo_azure_public_ip
+
+- name: Create virtual network interface card with external ip
+  azure.azcollection.azure_rm_networkinterface:
+    resource_group: "{{ cloud_demo_azure_resource_group }}"
+    name: "{{ cloud_demo_azure_nic_name }}"
+    virtual_network: "{{ cloud_demo_azure_vnet_name }}"
+    subnet: "{{ cloud_demo_azure_subnet_name }}"
+    public_ip_name: "{{ cloud_demo_azure_public_ip_name }}"
+    security_group: "{{ network_sec_group_name }}"
+  when: cloud_demo_azure_public_ip
+
+- name: Create VM
+  azure.azcollection.azure_rm_virtualmachine:
+    resource_group: "{{ cloud_demo_azure_resource_group }}"
+    name: "{{ cloud_demo_vm_name | default('demo_rhel_vm') }}"
+    vm_size: "{{ cloud_demo_azure_vm_size }}"
+    managed_disk_type: "{{ cloud_demo_azure_disk_type }}"
+    admin_username: "{{ cloud_demo_admin_user }}"
+    ssh_password_enabled: false
+    ssh_public_keys:
+      - path: "/home/{{ cloud_demo_admin_user }}/.ssh/authorized_keys"
+        key_data: "{{ cloud_demo_ssh_public_key }}"
+    network_interfaces: "{{ cloud_demo_azure_nic_name }}"
+    image:
+      offer: RHEL
+      publisher: RedHat
+      sku: "{{ cloud_demo_azure_rhel_vm_sku }}"
+      version: latest
+    max_price: "{{ cloud_demo_azure_vm_max_price }} "
+    priority: "{{ cloud_demo_azure_vm_priority }}"
+    tags:
+      deployment: ansible
+      purpose: demo
