@@ -1,22 +1,4 @@
 ---
-- name: Create resource group
-  azure.azcollection.azure_rm_resourcegroup:
-    name: "{{ cloud_demo_azure_resource_group }}"
-    location: "{{ cloud_demo_azure_region }}"
-
-- name: Create virtual network
-  azure.azcollection.azure_rm_virtualnetwork:
-    resource_group: "{{ cloud_demo_azure_resource_group }}"
-    name: "{{ cloud_demo_azure_vnet_name }}"
-    address_prefixes: "{{ cloud_demo_azure_vnet_cidr }}"
-
-- name: Add subnet
-  azure.azcollection.azure_rm_subnet:
-    resource_group: "{{ cloud_demo_azure_resource_group }}"
-    name: "{{ cloud_demo_azure_subnet_name }}"
-    address_prefix: "{{ cloud_demo_azure_subnet_cidr }}"
-    virtual_network: "{{ cloud_demo_azure_vnet_name }}"
-
 - name: Create public IP address
   azure.azcollection.azure_rm_publicipaddress:
     resource_group: "{{ cloud_demo_azure_resource_group }}"
@@ -37,30 +19,6 @@
     per_host: false
   when: cloud_demo_azure_public_ip
 
-- name: Create Network Security Group that allows SSH, RDP and HTTP
-  azure.azcollection.azure_rm_securitygroup:
-    resource_group: "{{ cloud_demo_azure_resource_group }}"
-    name: "{{ cloud_demo_azure_network_sec_group_name }}"
-    rules:
-      - name: SSH
-        protocol: Tcp
-        destination_port_range: 22
-        access: Allow
-        priority: 1001
-        direction: Inbound
-      - name: RDP
-        protocol: Tcp
-        destination_port_range: 3389
-        access: Allow
-        priority: 1002
-        direction: Inbound
-      - name: HTTP
-        protocol: Tcp
-        destination_port_range: 80
-        access: Allow
-        priority: 1003
-        direction: Inbound
-
 - name: Create virtual network interface card with internal ip
   azure.azcollection.azure_rm_networkinterface:
     resource_group: "{{ cloud_demo_azure_resource_group }}"
@@ -77,7 +35,7 @@
     virtual_network: "{{ cloud_demo_azure_vnet_name }}"
     subnet: "{{ cloud_demo_azure_subnet_name }}"
     public_ip_name: "{{ cloud_demo_azure_public_ip_name }}"
-    security_group: "{{ network_sec_group_name }}"
+    security_group: "{{ cloud_demo_azure_network_sec_group_name }}"
   when: cloud_demo_azure_public_ip
 
 - name: Create VM
